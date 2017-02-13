@@ -1,6 +1,6 @@
 package com.spring.seed.io.service;
 
-import com.spring.seed.io.entity.Entity;
+import com.spring.seed.io.entity.User;
 import java.util.Map;
 import org.springframework.data.domain.Page;
 
@@ -8,18 +8,18 @@ public interface IEntityService {
 
     long count();
 
-    Entity create(Entity resource);
+    User create(User resource);
 
-    Page<Entity> findAll();
+    Page<User> findAll();
 
     void delete(String id);
 
-    Page<Entity> findAllPaginatedAndSorted(int page, int size, String sortBy, String sortOrder);
+    Page<User> findAllPaginatedAndSorted(int page, int size, String sortBy, String sortOrder);
 
-    Page<Entity> search(int page, int size, String sortBy, String sortOrder, Map<String, String[]> filters);
+    Page<User> search(int page, int size, String sortBy, String sortOrder, Map<String, String[]> filters);
 
-    void update(String id, Entity resource);
+    void update(String id, User resource);
 
-    Entity findOne(String id);
+    User findOne(String id);
 }
 

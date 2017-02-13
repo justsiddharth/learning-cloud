@@ -1,6 +1,6 @@
 package com.spring.seed.io.controller;
 
-import com.spring.seed.io.entity.Entity;
+import com.spring.seed.io.entity.User;
 import com.spring.seed.io.service.IEntityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +12,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.elasticsearch.common.Preconditions;
+import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -26,12 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "api/v1/entity")
-@Api(value = "Entity", description = "The Entity API")
+@Api(value = "User", description = "The User API")
 public class EntityController {
 
+    private static final int PRETTY_PRINT_INDENT_FACTOR = 4;
     @Autowired
     IEntityService service;
-
     @Autowired
     private HttpServletRequest request;
 
@@ -47,20 +49,20 @@ public class EntityController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "Create Entity", notes = "Create a new Entity")
-    public Entity create(@Valid @RequestBody @ApiParam(value = "The Resource to be Created") final Entity resource) {
+    @ApiOperation(value = "Create User", notes = "Create a new User")
+    public User create(@Valid @RequestBody @ApiParam(value = "The Resource to be Created") final User resource) {
 
         Preconditions.checkNotNull(resource, "Resource provided is null");
         Optional<String> id = Optional.ofNullable(resource.getId());
         Preconditions.checkArgument(id.isPresent() == false, "Resource should have no id.");
-        Entity crusher = service.create(resource);
+        User crusher = service.create(resource);
         return crusher;
     }
 
     @RequestMapping(params = {}, method = RequestMethod.GET)
     @ApiOperation(value = "Find All", nickname = "findAll", notes = "Find All (max 50 results). " + "<br>This endpoint supports generic filtering. Examples: " + "<br><ul>"
             + "<li> match one field: `?field=value`" + "<li> match multiple fields: `?field1=value1&field2=value2`" + "<li> multiple values for field: `?field=value1&field=value2`" + "</ul>")
-    public List<Entity> findAll() {
+    public List<User> findAll() {
         return service.findAll().getContent();
     }
 
@@ -75,7 +77,7 @@ public class EntityController {
     @ApiOperation(value = "Find All Paginated And Sorted", nickname = "findAllPaginatedAndSorted", notes = "This endpoint supports generic filtering. Examples: " + "<br><ul>"
             + "<li> match one field: `?field=value`" + "<li> match multiple fields: `?field1=value1&field2=value2`" + "<li> multiple values for field: `?field=value1&field=value2`"
             + "<li> date time range filters: `?dateTimeFilter=field,fromDate,toDate`" + "</ul>")
-    public Page<Entity> findAllPaginatedAndSorted(@RequestParam("page") final int page,
+    public Page<User> findAllPaginatedAndSorted(@RequestParam("page") final int page,
             @RequestParam("size") final int size,
             @RequestParam("sortBy") final String sortBy,
             @RequestParam("sortOrder") final String sortOrder) {
@@ -85,7 +87,7 @@ public class EntityController {
     @RequestMapping(value = "/_search", params = {"page", "size", "sortBy", "sortOrder"}, method = RequestMethod.GET)
     @ApiOperation(value = "search", nickname = "search", notes = "This endpoint supports generic filtering. Examples: " + "<br><ul>" + "<li> match one field: `?field=value`"
             + "<li> match multiple fields: `?field1=value1&field2=value2`" + "<li> multiple values for field: `?field=value1&field=value2`" + "</ul>")
-    public Page<Entity> search(@RequestParam("page") final int page,
+    public Page<User> search(@RequestParam("page") final int page,
             @RequestParam("size") final int size,
             @RequestParam("sortBy") final String sortBy,
             @RequestParam("sortOrder") final String sortOrder) {
@@ -97,7 +99,7 @@ public class EntityController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update Resource", notes = "Update the existing Resource")
     public void update(@PathVariable("id") @ApiParam(value = "The Id of the Existing Resource to be Updated") final String id,
-            @Valid @RequestBody @ApiParam(value = "The Resource to be Updated") final Entity resource) {
+            @Valid @RequestBody @ApiParam(value = "The Resource to be Updated") final User resource) {
         Preconditions.checkNotNull(resource, "Resource provided is null");
         Optional<String> resourceId = Optional.ofNullable(resource.getId());
         Preconditions.checkArgument(resourceId.isPresent() == false, "Resource should have no id.");
@@ -105,10 +107,17 @@ public class EntityController {
     }
 
     @RequestMapping(value = "/{id:.+}", method = RequestMethod.GET)
-    public Entity findOne(@PathVariable("id") @ApiParam(value = "The Id of the Existing Resource to be Retrieved") final String id) {
-        Entity crusher = service.findOne(id);
-        Preconditions.checkNotNull(crusher, "Entity not found by id = " + id);
+    public User findOne(@PathVariable("id") @ApiParam(value = "The Id of the Existing Resource to be Retrieved") final String id) {
+        User crusher = service.findOne(id);
+        Preconditions.checkNotNull(crusher, "User not found by id = " + id);
         return crusher;
+    }
+
+    @RequestMapping(value = "/convert", method = RequestMethod.GET)
+    public String converter(@RequestParam("xmlString") @ApiParam(value = "The xml string to convert to json string") final String xmlString) {
+        JSONObject xmlJSONObj = XML.toJSONObject(xmlString);
+        String jsonPrettyPrintString = xmlJSONObj.toString(PRETTY_PRINT_INDENT_FACTOR);
+        return jsonPrettyPrintString;
     }
 
 }

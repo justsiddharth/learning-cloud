@@ -1,6 +1,6 @@
 package com.spring.seed.io.service.impl;
 
-import com.spring.seed.io.entity.Entity;
+import com.spring.seed.io.entity.User;
 import com.spring.seed.io.repository.IEntityRepository;
 import com.spring.seed.io.service.IEntityService;
 import java.util.ArrayList;
@@ -57,15 +57,15 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public Entity create(Entity crusher) {
+    public User create(User crusher) {
         String id = UUID.randomUUID().toString();
         crusher.setId(id);
-        Entity savedCrusher = repository.save(crusher);
+        User savedCrusher = repository.save(crusher);
         return savedCrusher;
     }
 
     @Override
-    public Page<Entity> findAll() {
+    public Page<User> findAll() {
         return repository.findAll(constructPageRequest(0, 1, "name", "ASC"));
     }
 
@@ -75,26 +75,26 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public Page<Entity> findAllPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
+    public Page<User> findAllPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
         return repository.findAll(constructPageRequest(page, size, sortBy, sortOrder));
     }
 
     @Override
-    public Page<Entity> search(int page, int size, String sortBy, String sortOrder, Map<String, String[]> filters) {
+    public Page<User> search(int page, int size, String sortBy, String sortOrder, Map<String, String[]> filters) {
         QueryBuilder query = addFilters(filters);
         return repository.search(query, constructPageRequest(page, size, sortBy, sortOrder));
     }
 
     @Override
-    public void update(String id, Entity resource) {
-        Entity crusher = findOne(id);
+    public void update(String id, User resource) {
+        User crusher = findOne(id);
         if (crusher != null) {
             repository.save(crusher);
         }
     }
 
     @Override
-    public Entity findOne(String id) {
+    public User findOne(String id) {
         return repository.findOne(id);
     }
 
