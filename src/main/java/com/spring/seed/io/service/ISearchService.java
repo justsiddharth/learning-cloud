@@ -9,6 +9,6 @@ public interface ISearchService {
 
     List<String> searchNames(String query);
 
-    Book searchBook(String query);
+    List<Book> searchBook(String query);
 }
 

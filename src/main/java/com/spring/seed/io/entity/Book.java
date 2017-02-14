@@ -20,7 +20,7 @@ public class Book {
     @NotNull
     private String authorName;
 
-    private String bookPoints;
+    private double bookPoints;
 
     private double averageRating;
 
@@ -28,11 +28,7 @@ public class Book {
 
     private String smallImageUrl;
 
-    private String publicationDate;
-
-    private String publicationYear;
-
-    private String publicationMonth;
+    private String releaseDate;
 
     private Map<String, Object> data;
 

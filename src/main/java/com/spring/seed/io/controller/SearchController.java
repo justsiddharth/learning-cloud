@@ -50,10 +50,9 @@ public class SearchController {
     }
 
     @RequestMapping(value = "/book", method = RequestMethod.GET)
-    public Book searchBook(@RequestParam("query") @ApiParam(value = "The query string") final String query) throws JAXBException, IOException {
-        Book result = service.searchBook(query);
-
-        return null;
+    public List<Book> searchBook(@RequestParam("query") @ApiParam(value = "The query string") final String query) throws JAXBException, IOException {
+        List<Book> result = service.searchBook(query);
+        return result;
     }
 
 }
