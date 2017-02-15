@@ -16,13 +16,16 @@ public class User {
     private String id = UUID.randomUUID().toString();
 
     @NotNull
-    private String firstname;
+    private String firstName;
 
     @NotNull
-    private String lastname;
+    private String lastName;
 
     @NotNull
     private String username;
+
+    @NotNull
+    private String password;
 
     private String organization;
 

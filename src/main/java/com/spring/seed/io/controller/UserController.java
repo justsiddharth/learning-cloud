@@ -1,32 +1,20 @@
 package com.spring.seed.io.controller;
 
 import com.spring.seed.io.entity.User;
-import com.spring.seed.io.entity.xml.GoodreadsResponse;
-import com.spring.seed.io.service.IEntityService;
+import com.spring.seed.io.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.elasticsearch.common.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,17 +23,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
-@RequestMapping(value = "api/v1/entity")
+@RequestMapping(value = "api/v1/user")
 @Api(value = "User", description = "The User API")
-public class EntityController {
+public class UserController {
 
-    private static final int PRETTY_PRINT_INDENT_FACTOR = 4;
-    final String uri = "https://www.goodreads.com/search/index.xml?key=jhZOsAHmozaMo9GZKbDQg";
     @Autowired
-    IEntityService service;
+    IUserService service;
+
     @Autowired
     private HttpServletRequest request;
 
@@ -59,6 +45,13 @@ public class EntityController {
         return service.count();
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/oauth")
+    @ResponseBody
+    @ResponseStatus(value = HttpStatus.OK)
+    public boolean login(@RequestParam("username") final String username, @RequestParam("password") final String password) {
+        return service.login(request.getParameterMap());
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Create User", notes = "Create a new User")
@@ -66,9 +59,9 @@ public class EntityController {
 
         Preconditions.checkNotNull(resource, "Resource provided is null");
         Optional<String> id = Optional.ofNullable(resource.getId());
-        Preconditions.checkArgument(id.isPresent() == false, "Resource should have no id.");
-        User crusher = service.create(resource);
-        return crusher;
+        Preconditions.checkArgument(id.isPresent() == true, "Resource should have no id.");
+        User user = service.create(resource);
+        return user;
     }
 
     @RequestMapping(params = {}, method = RequestMethod.GET)
@@ -120,31 +113,8 @@ public class EntityController {
 
     @RequestMapping(value = "/{id:.+}", method = RequestMethod.GET)
     public User findOne(@PathVariable("id") @ApiParam(value = "The Id of the Existing Resource to be Retrieved") final String id) {
-        User crusher = service.findOne(id);
-        Preconditions.checkNotNull(crusher, "User not found by id = " + id);
-        return crusher;
+        User user = service.findOne(id);
+        Preconditions.checkNotNull(user, "User not found by id = " + id);
+        return user;
     }
-
-    @RequestMapping(value = "/convert", method = RequestMethod.GET)
-    public String converter(@RequestParam("xmlString") @ApiParam(value = "The xml string to convert to json string") final String xmlString) throws JAXBException, IOException {
-        //        JSONObject xmlJSONObj = XML.toJSONObject(xmlString);
-        //        String jsonPrettyPrintString = xmlJSONObj.toString(PRETTY_PRINT_INDENT_FACTOR);
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
-        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-
-        String newUri = uri + "&q=harry";
-        ResponseEntity<String> result = restTemplate.exchange(newUri, HttpMethod.GET, entity, String.class);
-
-        //InputStream stream = new ByteArrayInputStream(result.getBody());
-        JAXBContext jc = JAXBContext.newInstance(GoodreadsResponse.class);
-        Unmarshaller unmarshaller = jc.createUnmarshaller();
-        GoodreadsResponse response = (GoodreadsResponse) unmarshaller.unmarshal(new StringReader(result.getBody()));
-System.out.println(response.getSearch().getResults().getBooks().get(0).getBestBook().getTitle());
-        System.out.println(response.getSearch().getResults().getBooks().get(0).getBestBook().getAuthor());
-        return "asdasd";
-    }
-
 }

@@ -4,7 +4,7 @@ import com.spring.seed.io.entity.User;
 import java.util.Map;
 import org.springframework.data.domain.Page;
 
-public interface IEntityService {
+public interface IUserService {
 
     long count();
 
@@ -21,5 +21,7 @@ public interface IEntityService {
     void update(String id, User resource);
 
     User findOne(String id);
+
+    boolean login(Map<String, String[]> filters);
 }
 

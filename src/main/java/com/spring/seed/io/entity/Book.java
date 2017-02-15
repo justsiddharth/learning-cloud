@@ -20,7 +20,17 @@ public class Book {
     @NotNull
     private String authorName;
 
+    private int bookId;
+
     private double bookPoints;
+
+    private String isbn;
+
+    private String isbn13;
+
+    private String publisher;
+
+    private String description;
 
     private double averageRating;
 
@@ -35,5 +45,8 @@ public class Book {
     private String createdDate;
 
     private String modifiedDate;
-}
 
+    private String num_pages;
+
+    private String format;
+}

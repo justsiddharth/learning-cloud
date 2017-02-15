@@ -1,8 +1,10 @@
 package com.spring.seed.io.service.impl;
 
-import com.spring.seed.io.entity.User;
-import com.spring.seed.io.repository.IEntityRepository;
-import com.spring.seed.io.service.IEntityService;
+import com.spring.seed.io.entity.BookFeed;
+import com.spring.seed.io.repository.IBookFeedRepository;
+import com.spring.seed.io.service.IBookFeedService;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,12 +21,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
-public class EntityServiceImpl implements IEntityService {
+public class BookFeedServiceImpl implements IBookFeedService {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private static final List<String> DEFAULT_PARAMS_TO_REMOVE = Arrays.asList("page", "size", "sortBy", "sortOrder", "fields");
 
     @Autowired
-    IEntityRepository repository;
+    IBookFeedRepository repository;
 
     public static Sort constructSort(final String sortBy, final String sortOrder) {
         return constructSort(Arrays.asList(sortBy), Arrays.asList(sortOrder), true);
@@ -57,16 +60,19 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public User create(User crusher) {
+    public BookFeed create(BookFeed bookfeed) {
         String id = UUID.randomUUID().toString();
-        crusher.setId(id);
-        User savedCrusher = repository.save(crusher);
+        bookfeed.setId(id);
+        String dateTime = LocalDateTime.now().format(formatter).toString();
+        bookfeed.setCreatedDate(dateTime);
+        bookfeed.setModifiedDate(dateTime);
+        BookFeed savedCrusher = repository.save(bookfeed);
         return savedCrusher;
     }
 
     @Override
-    public Page<User> findAll() {
-        return repository.findAll(constructPageRequest(0, 1, "name", "ASC"));
+    public Page<BookFeed> findAll() {
+        return repository.findAll(constructPageRequest(0, 100, "name", "ASC"));
     }
 
     @Override
@@ -75,26 +81,26 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public Page<User> findAllPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
+    public Page<BookFeed> findAllPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
         return repository.findAll(constructPageRequest(page, size, sortBy, sortOrder));
     }
 
     @Override
-    public Page<User> search(int page, int size, String sortBy, String sortOrder, Map<String, String[]> filters) {
+    public Page<BookFeed> search(int page, int size, String sortBy, String sortOrder, Map<String, String[]> filters) {
         QueryBuilder query = addFilters(filters);
         return repository.search(query, constructPageRequest(page, size, sortBy, sortOrder));
     }
 
     @Override
-    public void update(String id, User resource) {
-        User crusher = findOne(id);
-        if (crusher != null) {
-            repository.save(crusher);
+    public void update(String id, BookFeed resource) {
+        BookFeed bookfeed = findOne(id);
+        if (bookfeed != null) {
+            repository.save(bookfeed);
         }
     }
 
     @Override
-    public User findOne(String id) {
+    public BookFeed findOne(String id) {
         return repository.findOne(id);
     }
 

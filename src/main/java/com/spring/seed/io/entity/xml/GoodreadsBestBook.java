@@ -14,6 +14,9 @@ public class GoodreadsBestBook {
     @XmlElement(name = "title")
     private String title;
 
+    @XmlElement(name = "id")
+    private int id;
+
     @XmlElement(name = "author")
     private GoodreadsAuthor author;
 

@@ -20,19 +20,23 @@ public class BookFeed {
     @NotNull
     private String authorName;
 
-    private double averageRating;
-
     private String imageUrl;
 
     private String userId;
 
     private String userName;
 
+    private String firstName;
+
+    private String lastName;
+
     private String bookPoints;
 
     private String groupIds;
 
     private Status status;
+
+    private Recommendation recommendation;
 
     private Map<String, Object> data;
 

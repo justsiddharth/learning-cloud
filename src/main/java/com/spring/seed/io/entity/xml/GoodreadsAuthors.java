@@ -1,22 +1,19 @@
 package com.spring.seed.io.entity.xml;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
 
 @Data
+@XmlRootElement(name = "authors")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class GoodreadsAuthor {
+public class GoodreadsAuthors {
 
-    @XmlElement(name = "id")
-    private String id;
-
-    @XmlElement(name = "average_rating")
-    private String average_rating;
-
-    @XmlElement(name = "name")
-    private String name;
+    @XmlElement(name = "author")
+    private List<GoodreadsAuthor> author;
 }
 
 //<author>
