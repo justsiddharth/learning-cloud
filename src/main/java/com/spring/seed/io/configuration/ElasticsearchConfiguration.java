@@ -1,6 +1,7 @@
 package com.spring.seed.io.configuration;
 
 import javax.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -15,6 +16,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
+@Slf4j
 @Configuration
 @PropertySource(value = "classpath:elasticsearch.properties")
 @EnableElasticsearchRepositories(basePackages = "com.spring.seed.io")
@@ -22,6 +24,16 @@ public class ElasticsearchConfiguration {
 
     @Resource
     private Environment environment;
+
+    public static Client getUnicastEsClient() {
+        log.info("--- Setting up the unicast Elasticsearch client");
+        Settings settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch_sjain").put("client.transport.ping_timeout", "60s").put("client.transport.nodes_sampler_interval",
+                "60s").build();
+        TransportClient client = new TransportClient(settings);
+        TransportAddress address = new InetSocketTransportAddress("localhost", 9300);
+        client.addTransportAddress(address);
+        return client;
+    }
 
     @Bean
     public Client client() {

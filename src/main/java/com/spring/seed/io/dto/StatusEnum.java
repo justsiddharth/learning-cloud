@@ -1,5 +1,5 @@
 package com.spring.seed.io.dto;
 
-public enum StatusDto {
+public enum StatusEnum {
     STARTED_READING, READ, QUEUE, RECOMMENDED
 }

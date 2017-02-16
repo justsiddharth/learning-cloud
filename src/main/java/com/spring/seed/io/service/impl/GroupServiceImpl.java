@@ -1,60 +1,31 @@
 package com.spring.seed.io.service.impl;
 
+import com.spring.seed.io.configuration.ElasticsearchConfiguration;
 import com.spring.seed.io.entity.Group;
 import com.spring.seed.io.repository.IGroupRepository;
 import com.spring.seed.io.service.IGroupService;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.collections.CollectionUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Service
-public class GroupServiceImpl implements IGroupService {
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+public class GroupServiceImpl extends OperationsHelper implements IGroupService {
+
 
     private static final List<String> DEFAULT_PARAMS_TO_REMOVE = Arrays.asList("page", "size", "sortBy", "sortOrder", "fields");
 
     @Autowired
     IGroupRepository repository;
-
-    public static Sort constructSort(final String sortBy, final String sortOrder) {
-        return constructSort(Arrays.asList(sortBy), Arrays.asList(sortOrder), true);
-    }
-
-    public static Sort constructSort(final List<String> sortByList, final List<String> sortOrderList, final boolean ignoreCase) {
-        Sort sort = null;
-        List<Sort.Order> orders = new ArrayList<>();
-        for (int i = 0; i < sortByList.size(); i++) {
-            String sortOrder = (i > (sortOrderList.size() - 1)) ? Sort.Direction.DESC.toString() : sortOrderList.get(i);
-            Sort.Order order = new Sort.Order(Sort.Direction.fromString(sortOrder), sortByList.get(i));
-            if (ignoreCase) {
-                order = order.ignoreCase();
-            }
-            orders.add(order);
-        }
-        if (!orders.isEmpty()) {
-            sort = new Sort(orders);
-        }
-        return sort;
-    }
-
-    public static PageRequest constructPageRequest(final int page, final int size, final String sortBy, final String sortOrder) {
-        return new PageRequest(page, size, constructSort(sortBy, sortOrder));
-    }
 
     @Override
     public long count() {
@@ -68,8 +39,8 @@ public class GroupServiceImpl implements IGroupService {
         String dateTime = LocalDateTime.now().format(formatter).toString();
         group.setCreatedDate(dateTime);
         group.setModifiedDate(dateTime);
-        Group savedCrusher = repository.save(group);
-        return savedCrusher;
+        Group savedGroup = repository.save(group);
+        return savedGroup;
     }
 
     @Override
@@ -97,7 +68,15 @@ public class GroupServiceImpl implements IGroupService {
     public void update(String id, Group resource) {
         Group group = findOne(id);
         if (group != null) {
-            repository.save(group);
+            String dateTime = LocalDateTime.now().format(formatter).toString();
+            resource.setModifiedDate(dateTime);
+            final String doc = toJSON(resource);
+            final UpdateRequest updateRequest = new UpdateRequest("prod_group", "group", id);
+            updateRequest.doc(doc);
+            BulkRequestBuilder bulkRequest = ElasticsearchConfiguration.getUnicastEsClient().prepareBulk();
+            bulkRequest.add(updateRequest).execute().actionGet();
+            bulkRequest.setRefresh(true);
+            //repository.save(group);
         }
     }
 
@@ -114,18 +93,5 @@ public class GroupServiceImpl implements IGroupService {
             return true;
         }
         return false;
-    }
-
-    private BoolQueryBuilder addFilters(Map<String, String[]> filters) {
-        BoolQueryBuilder qb = new BoolQueryBuilder();
-        List<QueryBuilder> queries = new ArrayList<>();
-
-        filters.entrySet().stream().filter(entry -> !DEFAULT_PARAMS_TO_REMOVE.contains(entry.getKey())).filter(entry -> entry.getValue() != null && entry.getValue().length != 0).forEach(
-                entry -> Arrays.stream(entry.getValue()).filter(value -> !StringUtils.isEmpty(value)).forEach(
-                        value -> queries.add(new MatchQueryBuilder(entry.getKey().replace(".search", "").toString(), entry.getValue()))));
-        for (QueryBuilder query : queries) {
-            qb.must(query);
-        }
-        return qb;
     }
 }

@@ -49,7 +49,6 @@ public class BookFeedController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Create BookFeed", notes = "Create a new BookFeed")
     public BookFeed create(@Valid @RequestBody @ApiParam(value = "The Resource to be Created") final BookFeed resource) {
-
         Preconditions.checkNotNull(resource, "Resource provided is null");
         Optional<String> id = Optional.ofNullable(resource.getId());
         Preconditions.checkArgument(id.isPresent() == true, "Resource should have no id.");
@@ -62,6 +61,12 @@ public class BookFeedController {
             + "<li> match one field: `?field=value`" + "<li> match multiple fields: `?field1=value1&field2=value2`" + "<li> multiple values for field: `?field=value1&field=value2`" + "</ul>")
     public List<BookFeed> findAll() {
         return service.findAll().getContent();
+    }
+
+    @RequestMapping(value = "/showfeed", params = {"userId"}, method = RequestMethod.GET)
+    @ApiOperation(value = "Find all feed for User.", nickname = "showfeed", notes = "Show all feed for given user.")
+    public List<BookFeed> showFeed(@RequestParam("userId") final String userId) {
+        return service.showFeed(userId);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

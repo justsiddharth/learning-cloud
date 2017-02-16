@@ -106,8 +106,6 @@ public class UserController {
     public void update(@PathVariable("id") @ApiParam(value = "The Id of the Existing Resource to be Updated") final String id,
             @Valid @RequestBody @ApiParam(value = "The Resource to be Updated") final User resource) {
         Preconditions.checkNotNull(resource, "Resource provided is null");
-        Optional<String> resourceId = Optional.ofNullable(resource.getId());
-        Preconditions.checkArgument(resourceId.isPresent() == false, "Resource should have no id.");
         service.update(id, resource);
     }
 

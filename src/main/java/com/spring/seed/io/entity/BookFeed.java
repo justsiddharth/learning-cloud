@@ -1,5 +1,6 @@
 package com.spring.seed.io.entity;
 
+import com.spring.seed.io.dto.StatusEnum;
 import java.util.Map;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -22,27 +23,29 @@ public class BookFeed {
 
     private String imageUrl;
 
-    private String userId;
+    private String userUUID;
 
     private String userName;
 
-    private String firstName;
-
-    private String lastName;
+    private String name;
 
     private String bookPoints;
 
     private String groupIds;
 
-    private Status status;
+    private StatusEnum status;
 
-    private Recommendation recommendation;
+    private String recommendedUserId;
+
+    private String recommendedUserName;
 
     private Map<String, Object> data;
 
     private String createdDate;
 
     private String modifiedDate;
+
+    private boolean isDeprecated;
 }
 
 

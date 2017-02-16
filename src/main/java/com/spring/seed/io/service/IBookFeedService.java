@@ -1,6 +1,7 @@
 package com.spring.seed.io.service;
 
 import com.spring.seed.io.entity.BookFeed;
+import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
 
@@ -21,5 +22,7 @@ public interface IBookFeedService {
     void update(String id, BookFeed resource);
 
     BookFeed findOne(String id);
+
+    List<BookFeed> showFeed(String userId);
 }
 

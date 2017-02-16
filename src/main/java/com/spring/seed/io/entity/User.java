@@ -16,10 +16,7 @@ public class User {
     private String id = UUID.randomUUID().toString();
 
     @NotNull
-    private String firstName;
-
-    @NotNull
-    private String lastName;
+    private String name;
 
     @NotNull
     private String username;
@@ -27,8 +24,10 @@ public class User {
     @NotNull
     private String password;
 
+    @NotNull
     private String organization;
 
+    @NotNull
     private String emailId;
 
     private Set<String> categories;
