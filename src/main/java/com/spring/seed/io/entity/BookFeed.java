@@ -21,6 +21,8 @@ public class BookFeed {
     @NotNull
     private String authorName;
 
+    private String userImgUrl;
+
     private String imageUrl;
 
     private String userUUID;
@@ -35,10 +37,6 @@ public class BookFeed {
 
     private StatusEnum status;
 
-    private String recommendedUserId;
-
-    private String recommendedUserName;
-
     private Map<String, Object> data;
 
     private String createdDate;
@@ -46,6 +44,12 @@ public class BookFeed {
     private String modifiedDate;
 
     private boolean isDeprecated;
+
+    private String recommendedUserId;
+
+    private String recommendedUserName;
+
+    private String recommendedUserIonicId;
 }
 
 
