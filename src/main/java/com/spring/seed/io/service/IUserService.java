@@ -22,6 +22,6 @@ public interface IUserService {
 
     User findOne(String id);
 
-    boolean login(Map<String, String[]> filters);
+    User login(Map<String, String[]> filters);
 }
 

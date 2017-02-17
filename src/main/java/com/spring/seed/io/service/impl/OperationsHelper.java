@@ -10,23 +10,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
-import org.springframework.util.SystemPropertyUtils;
 
 @Slf4j
 public class OperationsHelper<T> {
 
-    private Class<T> entityClass;
-
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     public static final List<String> DEFAULT_PARAMS_TO_REMOVE = Arrays.asList("page", "size", "sortBy", "sortOrder", "fields");
-
     public static final String CREATED_DATE = "createdDate";
-
     static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
+    private Class<T> entityClass;
 
     public static Sort constructSort(final String sortBy, final String sortOrder) {
         return constructSort(Arrays.asList(sortBy), Arrays.asList(sortOrder), true);
@@ -60,6 +56,19 @@ public class OperationsHelper<T> {
         filters.entrySet().stream().filter(entry -> !DEFAULT_PARAMS_TO_REMOVE.contains(entry.getKey())).filter(entry -> entry.getValue() != null && entry.getValue().length != 0).forEach(
                 entry -> Arrays.stream(entry.getValue()).filter(value -> !StringUtils.isEmpty(value)).forEach(
                         value -> queries.add(new MatchQueryBuilder(entry.getKey().replace(".search", "").toString(), entry.getValue()))));
+        for (QueryBuilder query : queries) {
+            qb.must(query);
+        }
+        return qb;
+    }
+
+    public static BoolQueryBuilder addLoginFilters(Map<String, String[]> filters) {
+        BoolQueryBuilder qb = new BoolQueryBuilder();
+        List<QueryBuilder> queries = new ArrayList<>();
+
+        filters.entrySet().stream().filter(entry -> !DEFAULT_PARAMS_TO_REMOVE.contains(entry.getKey())).filter(entry -> entry.getValue() != null && entry.getValue().length != 0).forEach(
+                entry -> Arrays.stream(entry.getValue()).filter(value -> !StringUtils.isEmpty(value)).forEach(
+                        value -> queries.add(new TermQueryBuilder(entry.getKey().replace(".search", "").toString(), entry.getValue()))));
         for (QueryBuilder query : queries) {
             qb.must(query);
         }

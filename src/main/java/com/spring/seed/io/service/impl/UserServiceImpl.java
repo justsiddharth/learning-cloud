@@ -35,6 +35,7 @@ public class UserServiceImpl extends OperationsHelper implements IUserService {
         String dateTime = LocalDateTime.now().format(formatter).toString();
         user.setCreatedDate(dateTime);
         user.setModifiedDate(dateTime);
+        user.setScore(0L);
         User savedUser = repository.save(user);
         return savedUser;
     }
@@ -82,12 +83,13 @@ public class UserServiceImpl extends OperationsHelper implements IUserService {
     }
 
     @Override
-    public boolean login(Map<String, String[]> filters) {
+    public User login(Map<String, String[]> filters) {
         QueryBuilder query = addFilters(filters);
-        List<User> users = repository.search(query, constructPageRequest(0, 10, "firstName", SortOrder.ASC.toString())).getContent();
+        List<User> users = repository.search(query, constructPageRequest(0, 10, "name", SortOrder.ASC.toString())).getContent();
         if (CollectionUtils.isNotEmpty(users) && users.size() == 1) {
-            return true;
+            return users.get(0);
+        } else {
+            return null;
         }
-        return false;
     }
 }

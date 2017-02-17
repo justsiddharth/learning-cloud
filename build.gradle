@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: "io.spring.dependency-management"
+apply plugin: 'project-report'
 
 sourceCompatibility = 1.5
 version = '1.0'

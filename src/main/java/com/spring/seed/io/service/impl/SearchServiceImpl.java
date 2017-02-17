@@ -6,9 +6,9 @@ import com.spring.seed.io.entity.xml.GoodreadsAuthor;
 import com.spring.seed.io.entity.xml.GoodreadsBestBook;
 import com.spring.seed.io.entity.xml.GoodreadsBook;
 import com.spring.seed.io.entity.xml.GoodreadsBookResponse;
+import com.spring.seed.io.entity.xml.GoodreadsResponse;
 import com.spring.seed.io.entity.xml.GoodreadsSingleBook;
 import com.spring.seed.io.service.ISearchService;
-import com.spring.seed.io.entity.xml.GoodreadsResponse;
 import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -64,6 +64,7 @@ public class SearchServiceImpl implements ISearchService {
         @Override
         public Book apply(GoodreadsSingleBook goodreadsBook) {
             Book internalBook = new Book();
+            internalBook.setBookId(goodreadsBook.getId());
             internalBook.setTitle(goodreadsBook.getTitle());
             internalBook.setBookId(goodreadsBook.getId());
             internalBook.setDescription(goodreadsBook.getDescription());

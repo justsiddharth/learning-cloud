@@ -38,6 +38,8 @@ public class User {
 
     private Long score;
 
+    private String ionicId;
+
     private Map<String, Object> data;
 
     private String createdDate;

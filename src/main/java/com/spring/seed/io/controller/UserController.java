@@ -5,16 +5,19 @@ import com.spring.seed.io.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.elasticsearch.common.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,8 +51,13 @@ public class UserController {
     @RequestMapping(method = RequestMethod.GET, value = "/oauth")
     @ResponseBody
     @ResponseStatus(value = HttpStatus.OK)
-    public boolean login(@RequestParam("username") final String username, @RequestParam("password") final String password) {
-        return service.login(request.getParameterMap());
+    public User login(@RequestParam("username") final String username, @RequestParam("password") final String password) {
+        User user = service.login(request.getParameterMap());
+        if (user == null) {
+            throw new IllegalArgumentException("Login Credentials Invalid. Please try again.");
+        } else {
+            return user;
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -114,5 +122,10 @@ public class UserController {
         User user = service.findOne(id);
         Preconditions.checkNotNull(user, "User not found by id = " + id);
         return user;
+    }
+
+    @ExceptionHandler
+    void UserIllegalArgumentException(IllegalArgumentException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.BAD_REQUEST.value());
     }
 }
